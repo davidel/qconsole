@@ -1,0 +1,25 @@
+#include <eikon.rh>
+#include <qikon.rh>
+#include <qikcommand.rh>
+
+
+// Use this statement to ensure that the resources in the file have a unique ID
+// so that an application can use multiple resource files without resource ID
+// conflict. This statement must be the first non-comment statement in the file.
+NAME QCON
+
+// The three following resources are mandatory fields and need to be the 
+// first resource fields in the resource file. Need to be defined in this order.
+// These resources don't need to contain any useful info, just need to be there.
+
+// RSS_SIGNATURE can be used to specify version information
+RESOURCE RSS_SIGNATURE { }
+
+// Defines the name of the default file the application framework creates.
+// This resource must always be the second resource in the resource file.
+RESOURCE TBUF { buf = ""; }
+
+// This resource is used to define an application's GUI. 
+// Although it's not used directly by UIQ, its declaration is mandatory.
+RESOURCE EIK_APP_INFO {	}
+

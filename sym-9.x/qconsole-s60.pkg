@@ -1,0 +1,29 @@
+; qconsole.pkg
+
+; Specify the languages - as previously supported
+; Languages
+; none -  English only by default
+
+; List of localised vendor names - one per language. At least one must be provided (English [EN]). 
+; List must correspond to list of languages specified elsewhere in the .pkg
+%{"QConsole"}
+
+; The non-localised, globally unique vendor name (mandatory)
+:"QConsole"
+
+; Package header
+; Name, UID3, Major, Minor, Build, Package-type
+#{"QConsole"}, (0xE0001671), 1, 63, 0, TYPE=SA
+
+; ProductID for Series 60 3.x
+; Product/platform version UID, Major, Minor, Build, Component name
+[0x101F7961], 0, 0, 0, {"Series60ProductID"}
+
+; Files to install for the application
+; If you move the example to another destination then you also need to change these paths.
+".\resource\apps\qconsole.rsc"-"!:\resource\apps\qconsole.rsc"
+".\resource\apps\qconsole_loc.rsc"-"!:\resource\apps\qconsole_loc.rsc"
+".\private\10003a3f\apps\qconsole_reg.rsc"-"!:\private\10003a3f\import\apps\qconsole_reg.rsc"
+".\qconsole.exe"-"!:\sys\bin\qconsole.exe"
+"..\qconsole-passwd.txt"-"c:\shared\qconsole.txt"
+

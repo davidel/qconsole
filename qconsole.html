@@ -1,0 +1,761 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=windows-1252">
+  <meta name="Author" content="Davide Libenzi">
+  <meta name="Description" content="QConsole Home Page">
+  <meta name="GENERATOR" content="Mozillus">
+  <meta name="Keywords"
+ content="linux,symbian,epoc,bluetooth,console,server,bluez,gdbstub,rchunk,rthread,rsemaphore">
+  <title>QConsole Home Page</title>
+</head>
+<body
+ style="color: rgb(0, 0, 255); background-color: rgb(255, 255, 255);">
+<div style="text-align: center; font-family: monospace;"><b>QConsole
+Home Page<br>
+</b></div>
+<font style="font-family: monospace;"><br>
+</font>
+<div style="text-align: left; font-family: monospace;">
+<div style="text-align: center; font-weight: bold;">
+<div style="text-align: left;"><span style="font-weight: normal;"><span
+ style="font-weight: bold;">QConsole</span> is an utility I wrote to
+allow me to login in my Symbian devices and perform certain operations
+in a more easy and fast way than the standard GUI. Running applications
+(especially gdbstub) with parameters was especially what drove with to
+write <span style="font-weight: bold;">QConsole</span>. It is a
+Syambian executable (exe) that listen to the next available RFCOMM
+channel and serves only one connection at a time. While it is possible
+to have multiple connections served at the same time, I think that
+given the nature of Symbian devices, such feature can be skipped (at
+least for the very first releases, and you can always run multiple
+copies of <span style="font-weight: bold;">QConsole</span>). The <span
+ style="font-weight: bold;">QConsole</span> client is available for
+Linux and Windows. From now on I'll assume a Linux setup
+though, even because a Windows workstation will typically work as-is
+without requiring extra libraries to be installed.<br>
+<br>
+<br>
+<br>
+</span>
+<div style="text-align: center; font-weight: bold;">Build<br>
+</div>
+<span style="font-weight: normal;"><br>
+In order to use <span style="font-weight: bold;">QConsole</span>, you
+need the <a href="qtty.html">QTTY</a> console client (valid for <span
+ style="font-weight: bold;">QConsole</span> and <a
+ style="font-weight: bold;" href="wmconsole.html">WmConsole</a>), and
+the qconsole
+server EXE. Please take a look at the <a href="qtty.html">QTTY</a>
+home page for a description about how to build it and use it (no need
+to build the Windows version if you don't want to - a pre-built binary
+is availble inside the package). About the <span
+ style="font-weight: bold; font-style: italic;">qconsole</span>
+EXE, you have the .mmp file, so you can use your preferred tools to
+build an ARMI binary for your device. I personally use an
+all-native-Linux SDK that allows me to run the full development cycle
+on my Linux workstation (if I will find time to polish it, I will
+probably publish my Perl scripts and modified tools somewhere on this
+site). Once you built the <span
+ style="font-weight: bold; font-style: italic;">qconsole</span> EXE
+(you can also use the ready-to-use SIS install package available for
+download below, in case you're unwilling or unable to make a build),
+you need to upload it on the device. I personally find the NFS
+connection very handy for this (even though YMMV using p3nfs):<br>
+<br>
+<a href="http://www.koeniglich.de/p3nfs.html">http://www.koeniglich.de/p3nfs.html</a><br>
+<br>
+Through <span style="font-weight: bold;">QConsole</span> <span
+ style="font-style: italic;">get</span> and <span
+ style="font-style: italic;">put</span> commands you can still upload
+and download files on and from your device though.<br>
+<br>
+<br>
+<br>
+</span>
+<div style="text-align: center;">Setup<br>
+</div>
+<span style="font-weight: normal;"><br>
+First off, setup you kernel to have BlueTooth modules available for
+load, of directly linked inside the kernel. If you use a modern distro
+they already are in the correct plane for you. If you're using an old
+distro that doesn't have them, I'm assuming you can figure it out by
+yourself how to compile a new kernel with the required features
+(BlueTooth support). The you need to install <a
+ href="http://www.bluez.org/">BlueZ</a> Linux packages to
+set up the userspace infrastructure for BlueTooth. In my current setup:<br>
+<br>
+<span style="font-style: italic;"># apt-cache search bluez</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">bluez-bluefw - Bluetooth firmware
+loader</span><br style="font-style: italic;">
+<span style="font-style: italic;">bluez-hcidump - Bluetooth HCI
+protocol analyzer</span><br style="font-style: italic;">
+<span style="font-style: italic;">bluez-libs - Bluetooth libraries</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">bluez-libs-devel - Development
+libraries for Bluetooth applications</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">bluez-pan - Bluetooth PAN</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">bluez-pin - D-BUS Bluetooth PIN helper</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">bluez-sdp - Bluetooth SDP libraries
+and utilities</span><br style="font-style: italic;">
+<span style="font-style: italic;">bluez-sdp-devel - Development headers
+and libraries for Bluetooth SDP</span><br style="font-style: italic;">
+<span style="font-style: italic;">bluez-utils - Bluetooth utilities</span><br>
+<br>
+If you're planning to play with Linux BlueTooth, I suggest you to
+install them all. Then you can activate the BlueTooth stack. You can
+use this simple script, that if all goes well should bring you BT stack
+up in place:<br>
+<br>
+<span style="font-style: italic;">#!/bin/sh</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">/usr/sbin/hciconfig hci0 up</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">/usr/sbin/hcid</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">/usr/sbin/sdpd</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;"># HCI needs some time to "stabilize"
+before it starts accepting commands (/me think)</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">sleep 4</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">/usr/sbin/hciconfig hci0 noauth</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">/usr/sbin/hciconfig hci0 name MYDEV</span><br>
+<br>
+<br>
+You can find out if everything went fine by doig:<br>
+<br>
+<span style="font-style: italic;"># /usr/sbin/hciconfig -a</span><br
+ style="font-style: italic;">
+<br>
+This is the output in my machine (will be different on yours, depending
+mainly on the BT device you have):<br>
+<br>
+<span style="font-style: italic;">hci0:&nbsp;&nbsp; Type: USB </span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BD Address: 00:04:61:80:77:0F ACL MTU: 192:8&nbsp; SCO MTU: 64:8</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+UP RUNNING PSCAN ISCAN ENCRYPT </span><br style="font-style: italic;">
+<span style="font-style: italic;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+RX bytes:3521272 acl:126808 sco:0 events:30041 errors:0</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+TX bytes:4021524 acl:35060 sco:0 commands:1562 errors:0</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Features: 0xff 0xff 0x0b 0x00</span><br style="font-style: italic;">
+<span style="font-style: italic;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 </span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Link policy: HOLD SNIFF PARK </span><br style="font-style: italic;">
+<span style="font-style: italic;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Link mode: SLAVE ACCEPT </span><br style="font-style: italic;">
+<span style="font-style: italic;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Name: 'MYDEV'</span><br style="font-style: italic;">
+<span style="font-style: italic;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Class: 0x120104</span><br style="font-style: italic;">
+<span style="font-style: italic;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Service Classes: Networking, Object Transfer</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Device Class: Computer, Desktop workstation</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+HCI Ver: 1.1 (0x1) HCI Rev: 0x1bb LMP Ver: 1.1 (0x1) LMP Subver: 0x1bb</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Manufacturer: Cambridge Silicon Radio (10)</span><br>
+<br>
+The next step is to edit your <span style="font-style: italic;">/etc/bluetooth/pin</span>
+file to set a PIN different from "BlueZ". Then you can start by
+activating the BlueTooth stack on your device. In my Nokia 6600 is
+inside the "Connections" folder inside the main menu. Then, it is time
+to pair your device with your PC BlueTooth link. Somewhere inside your
+device's BlueTooth menus there is the option to pair your device with
+other ones. Select that and let your portable device to scan for
+available devices in your piconet. It should fine your PC node with the
+name you set in your BT startup script (MYDEV in the example above).
+Select it and input the PIN you set in your <span
+ style="font-style: italic;">/etc/bluetooth/pin</span> file. If it
+doesn't accept it, you likely changed the <span
+ style="font-style: italic;">/etc/bluetooth/pin</span> after you
+started the BT stack on your machine. Stop the BT stack with something
+like:<br>
+<br>
+<span style="font-style: italic;">#!/bin/sh</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">/usr/bin/killall -TERM sdpd</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">/usr/bin/killall -TERM hcid</span><br
+ style="font-style: italic;">
+<span style="font-style: italic;">/usr/sbin/hciconfig hci0 down</span><br>
+<br>
+Then restart it again using the same script you used before. This time
+you should be able to successfully pair you portable device with your
+Linux box. It's not over on that side, since you will need to set you
+Linux box BT node (that you just paired) as authorized. The <span
+ style="font-weight: bold;">qtty</span> client accepts either BlueTooth
+device names or BlueTooth device addresses to be specified with the
+"--qc-addr BTADDR" command line directive. You can
+use 'hcitool' to find out all reachable device in your area. In my
+case it will show:<br>
+<br>
+<span style="font-style: italic;"># hcitool scan</span><br
+ style="font-style: italic;">
+<br style="font-style: italic;">
+<span style="font-style: italic;">00:0E:6D:20:3E:ED&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Dudi6600</span><br style="font-style: italic;">
+<br>
+Here "Dudi6600" is the name I gave to my BT device, and
+"00:0E:6D:20:3E:ED" is the BT device address (BTADDR) we were searching
+for. The next step involves editing the <span
+ style="font-style: italic;">c:\system\data\qconsole.txt</span> file to
+change/add users. The file lists many lines in the "USERNAME PASSWORD"
+format. It's time to start the <span style="font-weight: bold;">QConsole</span>
+binary on your device, that, if nothing really wrong happen, will
+display:<br>
+<br>
+<span style="font-style: italic;">QConsole ready on channel NN</span><br>
+<br>
+At this point you can finally run <span
+ style="font-style: italic; font-weight: bold;">qtty</span> to connect
+with your device <span style="font-weight: bold;">QConsole</span>
+server:<br>
+<br>
+<span style="font-style: italic;">$ qtty --qc-addr BTADDR --qc-channel
+NN --user USER --pass PASS</span><br>
+<br>
+In my case it will end up to:<br>
+<br>
+</span><span style="font-weight: normal;"><span
+ style="font-style: italic;">$ qtty --qc-addr Dudi6600 --qc-channel 4
+--user USER --pass PASS</span></span><br>
+<span style="font-weight: normal;"><br>
+If you use BlueTooth device names instead of addresses, it can happen
+that, if the BlueTooth name is not cached inside the <span
+ style="font-weight: bold;">qtty</span> device cache file, it can take
+ten to fitheen seconds for the name lookup (once the name is cached, it
+will be instantaneous). You should see the <span
+ style="font-weight: bold;">QConsole</span>
+welcome message and its prompt ("$ "). The default USER as installed by
+the .SIS file supplied with the tarbal is "qconsole", while the default
+PASS is "server" (and you are suggested to change them).<br>
+<br>
+<br>
+<br>
+<br>
+</span>
+<div style="text-align: center;"><span style="font-weight: bold;">Commands
+Reference</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[help]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">help</span></span><br>
+<br>
+<span style="font-weight: normal;">Prints the QConsole help screen.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[pwd]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">pwd</span></span><br>
+<br>
+<span style="font-weight: normal;">Prints the current working
+directory. File names that are not prepended by drive names or
+backslash are assumed from the current directory (pwd).</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[exit]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">exit</span></span><br
+ style="font-style: italic;">
+<br>
+<span style="font-weight: normal;">Quits the QConsole session.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[shutdown]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">shutdown</span></span><br
+ style="font-style: italic;">
+<br>
+<span style="font-weight: normal;">Quits the QConsole session and tells
+the QConsole server to shutdown.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+</span><span style="font-weight: normal;"><span
+ style="font-weight: bold;">[reboot]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">reboot</span></span><br
+ style="font-style: italic;">
+<br>
+<span style="font-weight: normal;">Quits the QConsole session and
+reboot the remote device.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[cd]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">cd DIR</span></span><br>
+<br>
+<span style="font-weight: normal;">Change the current directory to DIR.
+The DIR parameter can be the string "..", that will make the current
+directory to go up one level.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[ls]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">ls [DIR/FILE]</span></span><br>
+<br>
+<span style="font-weight: normal;">Lists the current directory or the
+specified path.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[ps]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">ps</span></span><br>
+<br>
+<span style="font-weight: normal;">Lists currently running processes.
+The format of the output lines is:</span><br>
+<br>
+<span style="font-weight: normal;">PID PPID&nbsp; FLG
+PRI&nbsp;&nbsp;&nbsp;&nbsp; UID2&nbsp;&nbsp;&nbsp;&nbsp; UID3 NAME</span><br>
+<br>
+<span style="font-weight: normal;">Where:</span><br>
+<br>
+<span style="font-weight: normal;">PID&nbsp;&nbsp;&nbsp; = Process Id</span><br>
+<span style="font-weight: normal;">PPID&nbsp;&nbsp; = Owner process Id</span><br>
+<span style="font-weight: normal;">FLG&nbsp;&nbsp;&nbsp; = Flags:</span><br>
+<span style="font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+P = Protected</span><br>
+<span style="font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+R = Loaded from ROM</span><br>
+<span style="font-weight: normal;">PRI&nbsp;&nbsp;&nbsp; = Priority</span><br>
+<span style="font-weight: normal;">UID2&nbsp;&nbsp; = Second UID of the
+application</span><br>
+<span style="font-weight: normal;">UID3&nbsp;&nbsp; = Third UID of the
+application</span><br>
+<span style="font-weight: normal;">NAME&nbsp;&nbsp; = Process name</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[kill]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">kill PID</span></span><br>
+<br>
+<span style="font-weight: normal;">Terminates the process identified by
+PID.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[prio]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">prio PID PRIO</span></span><br>
+<br>
+<span style="font-weight: normal;">Adjust process PID priority to PRIO.
+the priority PRIO can be one of:</span><br>
+<span style="font-weight: normal;">L = Low</span><br>
+<span style="font-weight: normal;">B = Background</span><br>
+<span style="font-weight: normal;">F = Foreground</span><br>
+<span style="font-weight: normal;">H = High</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[prot]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">prot PID PROT</span></span><br>
+<br>
+<span style="font-weight: normal;">Set/unset process PID protected
+state. The PROT parameters can be one of:</span><br>
+<span style="font-weight: normal;">P = Protected</span><br>
+<span style="font-weight: normal;">U = Unprotected</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[pinf]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">pinf PID</span></span><br>
+<br>
+<span style="font-weight: normal;">Display process PID informations.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[pren]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">pren PID NAM</span></span><br>
+<br>
+<span style="font-weight: normal;">Change process PID name to NAME.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[run]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">run APP/EXE ...</span></span><br>
+<br>
+<span style="font-weight: normal;">Starts the application or exe with
+the specified parameters.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[drives]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">drives</span></span><br>
+<br>
+<span style="font-weight: normal;">Lists available drives and
+associated information. The output of the command is composed by many
+lines with the format:</span><br>
+<br>
+<span style="font-weight: normal;">DR&nbsp;&nbsp;&nbsp;
+FST&nbsp;&nbsp;&nbsp;&nbsp; SIZE&nbsp;&nbsp;&nbsp;&nbsp; FREE</span><br>
+<br>
+<span style="font-weight: normal;">Where:</span><br>
+<br>
+<span style="font-weight: normal;">DR&nbsp;&nbsp; = Drive name</span><br>
+<span style="font-weight: normal;">FST&nbsp; = File system type</span><br>
+<span style="font-weight: normal;">SIZE = Drive size in Kb</span><br>
+<span style="font-weight: normal;">FREE = Drive's free space in Kb</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[mkdir]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">mkdir DIR</span></span><br>
+<br>
+<span style="font-weight: normal;">Creates the directory specified by
+DIR.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[rmdir]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">rmdir DIR</span></span><br>
+<br>
+<span style="font-weight: normal;">Removes the directory specified by
+DIR.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[rmtree]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">rmtree DIR</span></span><br>
+<br>
+<span style="font-weight: normal;">Removes the whole tree underneath
+DIR. Note that no confirmation is asked, so the command can result
+pretty dangerous.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[rm]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">rm FILE</span></span><br>
+<br>
+<span style="font-weight: normal;">Removes the file specified by FILE.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[chmod]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">chmod MODE FILE</span></span><br>
+<br>
+<span style="font-weight: normal;">Change the access mode of FILE
+applying MODE changes. The MODE paremeter is composed by a first
+character either '+' (add mode) or '-' (remove mode), and one or more
+mode characters:</span><br>
+<span style="font-weight: normal;">h = Hidden</span><br>
+<span style="font-weight: normal;">w = Write</span><br>
+<span style="font-weight: normal;">s = System</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[mv]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">mv OLD NEW</span></span><br>
+<br>
+<span style="font-weight: normal;">Renames files or directories from
+OLD to NEW. The two file names must be on the same drive for the `mv`
+command to succeed.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[cp]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">cp SRC DST</span></span><br>
+<br>
+<span style="font-weight: normal;">Copy SRC file onto DST file.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[cat]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">cat FILE</span></span><br>
+<br>
+<span style="font-weight: normal;">Dump the content of remote file FILE
+on screen.</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[lsthr]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">lsthr [PID]</span></span><br>
+<br>
+<span style="font-weight: normal;">Lists threads of process PID, or all
+existing threads if PID is not specified. The output of the command is
+composed by multiple lines with the format:</span><br>
+<br>
+<span style="font-weight: normal;">TID&nbsp; PID&nbsp; FLG&nbsp;
+PRI&nbsp;&nbsp; HSIZ&nbsp; SSIZ&nbsp;&nbsp; PH&nbsp;&nbsp; TH NAME</span><br>
+<br>
+<span style="font-weight: normal;">Where:</span><br>
+<br>
+<span style="font-weight: normal;">TID&nbsp;&nbsp; = Thread Id</span><br>
+<span style="font-weight: normal;">PID&nbsp;&nbsp; = Process Id</span><br>
+<span style="font-weight: normal;">FLG&nbsp;&nbsp; = Thread flags:</span><br>
+<span style="font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+P = Protected</span><br>
+<span style="font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+R = Loaded from ROM</span><br>
+<span style="font-weight: normal;">PRI&nbsp;&nbsp; = Thread priority</span><br>
+<span style="font-weight: normal;">HSIZ&nbsp; = Heap size in Kb</span><br>
+<span style="font-weight: normal;">SSIZ&nbsp; = Stack size in Kb</span><br>
+<span style="font-weight: normal;">PH&nbsp;&nbsp;&nbsp; = Process
+handle count</span><br>
+<span style="font-weight: normal;">TH&nbsp;&nbsp;&nbsp; = Thread handle
+count</span><br>
+<span style="font-weight: normal;">NAME&nbsp; = Thread name</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[lssem]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">lssem</span></span><br>
+<br>
+<span style="font-weight: normal;">Lists all global semaphores
+available on the system. The output of the command is composed by
+multiple lines with the format:</span><br>
+<br>
+<span style="font-weight: normal;">CNT NAME</span><br>
+<br>
+<span style="font-weight: normal;">Where:</span><br>
+<br>
+<span style="font-weight: normal;">CNT&nbsp;&nbsp; = Semaphore internal
+count value</span><br>
+<span style="font-weight: normal;">NAME&nbsp; = Semaphore name</span><br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">[lsrchk]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">lsrchk</span></span><br
+ style="font-style: italic;">
+<br>
+<span style="font-weight: normal;">Lists all global memory chunks
+available on the system. The output of the command is composed by
+multiple lines with the format:</span><br>
+<br>
+<span style="font-weight: normal;">CSIZ&nbsp;&nbsp;&nbsp;&nbsp;
+MSIZ&nbsp; FLG&nbsp;&nbsp;&nbsp; MADDR NAME</span><br>
+<br>
+<span style="font-weight: normal;">Where:</span><br>
+<br>
+<span style="font-weight: normal;">CSIZ&nbsp; = RChunk current size in
+Kb</span><br>
+<span style="font-weight: normal;">MSIZ&nbsp; = RChunk maximum size in
+Kb</span><br>
+<span style="font-weight: normal;">FLG&nbsp;&nbsp; = RChunk flags:</span><br>
+<span style="font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+R = Readable</span><br>
+<span style="font-weight: normal;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+W = Writable</span><br>
+<span style="font-weight: normal;">MADDR = Mapping address seen by the
+QConsole process</span><br>
+<span style="font-weight: normal;">NAME&nbsp; = RChunk name<br>
+</span><br>
+</div>
+<span style="font-weight: normal;"><span style="font-weight: bold;">[lspdd]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">lspdd</span></span><br>
+<br>
+<span style="font-weight: normal;">Lists all physical devices
+available on the system. The output of the command is composed by
+multiple lines with the format:</span><br>
+<br>
+<span style="font-weight: normal;">NAME</span><br>
+<br>
+<span style="font-weight: normal;">Where:</span><br>
+<br>
+<span style="font-weight: normal;"></span><span
+ style="font-weight: normal;">NAME&nbsp; = Physical device name</span><br>
+</div>
+<span style="font-weight: normal;"></span><br>
+<span style="font-weight: normal;"><span style="font-weight: bold;">[lsldd]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">lsldd</span></span><br>
+<br>
+<span style="font-weight: normal;">Lists all logical devices
+available on the system. The output of the command is composed by
+multiple lines with the format:</span><br>
+<br>
+<span style="font-weight: normal;">NAME</span><br>
+<br>
+<span style="font-weight: normal;">Where:</span><br>
+<br>
+<span style="font-weight: normal;"></span><span
+ style="font-weight: normal;">NAME&nbsp; = Logical device name</span><br>
+</div>
+<span style="font-weight: normal;"></span><span
+ style="font-weight: normal;"><span style="font-weight: bold;"><br>
+</span></span><span style="font-weight: normal;"><span
+ style="font-weight: bold;">[lsdll]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">lsdll</span></span><br>
+<br>
+<span style="font-weight: normal;">Lists all loaded DLLs
+available on the system. The output of the command is composed by
+multiple lines with the format:</span><br>
+<br>
+<span style="font-weight: normal;">NAME&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+UID2&nbsp;&nbsp; UID3 FILENAME</span><br>
+<br>
+<span style="font-weight: normal;">Where:</span><br>
+<br>
+<span style="font-weight: normal;"></span><span
+ style="font-weight: normal;">NAME&nbsp;&nbsp;&nbsp;&nbsp; = DLL
+internal name<br>
+UID2&nbsp;&nbsp;&nbsp;&nbsp; = Seconds UID of the DLL<br>
+UID3&nbsp;&nbsp;&nbsp;&nbsp; = Third UID of the DLL<br>
+FILENAME = Full path of the executable from where the DLL was loaded
+from<br>
+</span>
+</div>
+<span style="font-weight: normal;"></span><span
+ style="font-weight: normal;"><span style="font-weight: bold;"></span></span><span
+ style="font-weight: normal;"><span style="font-weight: bold;"><br>
+[hdump]<br>
+</span></span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">hdump</span><br>
+<br>
+Dumps all the device infromation available on the system.<br>
+</span></div>
+<span style="font-weight: normal;"><span style="font-weight: bold;"><br>
+[find]<br>
+</span></span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">find PATH MATCH</span><br>
+<br>
+Recursively searches inside PATH for MATCH file or directory name
+(wildcards are allowed in MATCH).<br>
+</span></div>
+<span style="font-weight: normal;"><span style="font-weight: bold;"><br>
+</span></span><span style="font-weight: normal;"><span
+ style="font-weight: bold;">[getchk]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">getchk CHK LOC</span></span><br>
+<br>
+<span style="font-weight: normal;">Dumps the content of the remote
+chunk (on device) CHK to local file LOC.<br>
+</span>
+</div>
+<br>
+<span style="font-weight: normal;"><span style="font-weight: bold;">[get]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">get [-R] REM LOC</span></span><br>
+<br>
+<span style="font-weight: normal;">Copies the remote file(s) (on
+device) REM to local file/path LOC. Wildcards allowed in REM. Allowed
+flags for the command are:<br>
+<br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">R =
+Recurse to subdirectories</span><br>
+</div>
+<span style="font-weight: normal;"></span></div>
+<span style="font-weight: normal;"><span style="font-weight: bold;"></span></span><span
+ style="font-weight: normal;"><br>
+</span><span style="font-weight: normal;"><span
+ style="font-weight: bold;">[put]</span><br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">Usage:
+<span style="font-style: italic;">put [-fR] REM LOC</span></span><br>
+<br>
+<span style="font-weight: normal;">Copies the local file(s) LOC to the
+remote file/path (on device) REM. Wildcards allowed in LOC. Allowed
+flags for the command are:<br>
+<br>
+</span>
+<div style="margin-left: 40px;"><span style="font-weight: normal;">R = </span><span
+ style="font-weight: normal;">Recurse to subdirectories<br>
+f = Force the missing subdirectories creation<br>
+</span></div>
+</div>
+<span style="font-weight: normal;"></span><span
+ style="font-weight: normal;"><span style="font-weight: bold;"></span></span><br>
+<br>
+<span style="font-weight: normal;"><br>
+</span>
+<div style="text-align: center; font-weight: bold;">Download<br>
+</div>
+<span style="font-weight: normal;"><br>
+The latest version of <span style="font-weight: bold;">QConsole</span>
+is available here:<br>
+<br>
+<a href="qconsole-1.61.tar.gz">qconsole-1.61.tar.gz</a><br>
+<br>
+Note: When updating the qconsole binary on the device to the newest
+version, you need also get the latest <a href="qtty.html">QTTY</a>
+console client since changes in the protocol might be required in order
+to support new features.<br>
+<br>
+<br>
+<br>
+</span>
+<div style="text-align: center; font-weight: bold;">Author<br>
+</div>
+<span style="font-weight: normal;"><br>
+<span style="font-weight: bold;">QConsole</span> has been written by
+Davide Libenzi &lt;<a href="mailto:davidel@xmailserver.org">davidel@xmailserver.org</a>&gt;
+(across an hot summer 2004 weekend) and is released to public domain
+under <a href="http://www.gnu.org/copyleft/gpl.html">GPL</a> version 2
+(please read the COPYING file included in the source tarbal). For the
+author home page you can click <a
+ href="http://www.xmailserver.org/davide.html">here</a>.<br>
+<br>
+<br>
+<br>
+</span>
+<div style="text-align: center;"><span style="font-weight: normal;"><span
+ style="font-weight: bold;">Links</span></span><br
+ style="font-weight: bold;">
+</div>
+<span style="font-weight: normal;"><br>
+<a href="http://freshmeat.net/projects/qconsole/">FreshMeat Home Page</a><br>
+<br>
+<br>
+<br>
+</span></div>
+</div>
+</div>
+<p style="text-align: left; font-family: monospace;"> </p>
+</body>
+</html>
