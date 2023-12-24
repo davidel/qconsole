@@ -1,0 +1,2 @@
+# qconsole
+Symbian console
